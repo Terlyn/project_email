@@ -1,20 +1,21 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <router-link class="nav-link active" aria-current="page" to="/">Home</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/login">Login</router-link>
-        </li>
-      </ul>
+  <nav class="bg-pink-400">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <a class="text-white text-xl font-bold" href="#">Navbar</a>
+        </div>
+        <div class="flex-1 flex items-center justify-start">
+          <div class="ml-4 flex items-center space-x-4">
+            <router-link class="text-pink-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/" exact>Home</router-link>
+            <router-link class="text-pink-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium" to="/login">Login</router-link>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 </template>
+
+<style scoped>
+/* Estilos adicionales según tus necesidades */
+</style>

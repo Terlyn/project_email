@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/username/projectname/api/handlers" // Asegúrate de usar la ruta completa del módulo
+	"github.com/Terlyn/project_email/Backend/cmd/api/handlers" // Asegúrate de usar la ruta completa del módulo
 )
 
 // config is the type for all application configuration

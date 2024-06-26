@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -39,7 +40,7 @@ func (h *Handlers) Search(w http.ResponseWriter, r *http.Request) {
 // GetEmails es el manejador para la ruta /emails
 func (h *Handlers) GetEmails(w http.ResponseWriter, r *http.Request) {
 	// Leer el archivo JSON
-	fileData, err := ioutil.ReadFile("/Users/macbook/Documents/proyecto_v2_mail/Backend/cmd/api/handlers/allen-p.json")
+	fileData, err := ioutil.ReadFile("/Users/macbook/Documents/proyecto_v2_mail/Data/bachs/allen-p.json")
 	if err != nil {
 		log.Fatalf("Error al leer el archivo: %v", err)
 	}
@@ -91,4 +92,34 @@ func extractBody(content string) string {
 	}
 
 	return strings.TrimSpace(content[bodyIndex+2:])
+}
+
+// SearchEmails maneja la solicitud POST para buscar correos electrónicos
+func (h *Handlers) SearchEmails(w http.ResponseWriter, r *http.Request) {
+	var requestBody struct {
+		SearchQuery string `json:"searchQuery"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	// Imprime el término de búsqueda en la consola
+	fmt.Println("Search query received:", requestBody.SearchQuery)
+
+	// Aquí puedes implementar la lógica de búsqueda de correos electrónicos
+	// Por ejemplo, enviar una respuesta JSON con una lista de correos electrónicos
+	emails := []string{"email1@example.com", "email2@example.com"}
+
+	// Convertir la lista de correos electrónicos a JSON
+	jsonResponse := map[string]interface{}{
+		"emails": emails,
+	}
+
+	// Codificar la respuesta JSON y enviarla
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(jsonResponse)
 }

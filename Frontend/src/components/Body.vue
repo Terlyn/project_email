@@ -9,13 +9,13 @@
           placeholder="Search"
           class="border border-pink-300 p-2 flex-grow rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
         />
-        <button @click="submitHandler" class="bg-pink-500 text-white p-2 ml-2 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm">
+        <button @click.prevent="submitHandler" class="bg-pink-500 text-white p-2 ml-2 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm">
           Search
         </button>
       </div>
 
       <!-- Emails Table -->
-      <div class="overflow-x-auto">
+      <div class="overflow-x-auto" v-if="searched && emailsToShow.length > 0">
         <table class="min-w-full border border-pink-200">
           <thead class="bg-pink-50">
             <tr>
@@ -26,8 +26,9 @@
           </thead>
           <tbody class="bg-white divide-y divide-pink-200 text-sm">
             <tr
-              v-for="(email, index) in emails"
+              v-for="(email, index) in emailsToShow"
               :key="index"
+              :class="{'bg-pink-200': selectedEmailIndex === index}"
               class="hover:bg-pink-100 cursor-pointer"
               @click="showEmailBody(index)"
             >
@@ -37,12 +38,25 @@
             </tr>
           </tbody>
         </table>
+        <div class="flex justify-center">
+          <button v-if="remainingEmails > 0" @click="loadMore" class="bg-pink-500 text-white p-2 rounded-lg mt-4 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm">
+            <span class="loader"></span>
+          </button>
+        </div>
+        <div class="flex justify-center">
+          <button v-if="emailsToShow.length > 3" @click="showLess" class="bg-pink-500 text-white p-2 rounded-lg mt-4 hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm">
+            Mostrar menos resultados
+          </button>
+        </div>
       </div>
 
       <!-- Display Email Body -->
       <div v-if="selectedEmailBody" class="p-6 bg-white shadow-md rounded-lg mt-4">
         <h1 class="text-lg font-bold mb-2">Email Body</h1>
         <p>{{ selectedEmailBody }}</p>
+      </div>
+      <div v-else-if="searched && emails.length === 0" class="p-6 bg-white shadow-md rounded-lg mt-4">
+        <p>No se encontraron resultados.</p>
       </div>
     </div>
   </div>
@@ -63,8 +77,16 @@ export default {
     return {
       searchQuery: "",
       emails: this.Emails,
-      selectedEmailBody: ""
+      selectedEmailBody: "",
+      selectedEmailIndex: null,
+      searched: false,
+      emailsToShow: [] // Nuevo array para almacenar los emails mostrados
     };
+  },
+  computed: {
+    remainingEmails() {
+      return this.emails.length - this.emailsToShow.length;
+    }
   },
   mounted() {
     if (this.emails.length === 0) {
@@ -83,6 +105,15 @@ export default {
     async submitHandler() {
       console.log("submitHandler called - success!");
 
+      if (this.searchQuery.trim() === "") {
+        this.emails = [];
+        this.searched = false;
+        this.selectedEmailBody = "";
+        this.selectedEmailIndex = null;
+        this.emailsToShow = [];
+        return;
+      }
+
       const payload = {
         searchQuery: this.searchQuery,
       }
@@ -96,17 +127,35 @@ export default {
           }
         });
         const data = await response.json();
+        console.log("Response from backend:", data); // Verificar la estructura de los datos
+
         if (data.error) {
           console.log("Error:", data.message);
         } else {
-          console.log(data);
+          this.emails = Array.isArray(data) ? data : []; // Asegurarse de que los datos sean un array
+          this.searched = true;
+          this.selectedEmailBody = "";
+          this.selectedEmailIndex = null;
+          this.showInitialResults();
         }
       } catch (error) {
         console.error("There was an error with the search:", error);
       }
     },
+    showInitialResults() {
+      this.emailsToShow = this.emails.slice(0, 3); // Mostrar solo los primeros 3 resultados
+    },
+    loadMore() {
+      const currentLength = this.emailsToShow.length;
+      const remainingEmails = this.emails.slice(currentLength, currentLength + 3);
+      this.emailsToShow = [...this.emailsToShow, ...remainingEmails];
+    },
+    showLess() {
+      this.emailsToShow = this.emails.slice(0, 3); // Mostrar solo los primeros 3 resultados después de cargar más
+    },
     showEmailBody(index) {
-      this.selectedEmailBody = this.emails[index].body;
+      this.selectedEmailBody = this.emailsToShow[index].body;
+      this.selectedEmailIndex = index;
     }
   }
 }
@@ -115,5 +164,20 @@ export default {
 <style scoped>
 .container {
   max-width: 100%;
+}
+.bg-pink-200 {
+  background-color: #fbcfe8; /* Ajusta este color según sea necesario */
+}
+.loader {
+  border: 4px solid #f3f3f3; /* Light grey */
+  border-top: 4px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

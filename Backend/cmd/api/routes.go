@@ -23,7 +23,9 @@ func (app *application) routes() http.Handler {
 
 	mux.Get("/", app.handlers.Home)
 	mux.Get("/search", app.handlers.Search)
-	mux.Get("/emails", app.handlers.GetEmails) // Nueva ruta
+	mux.Get("/emails", app.handlers.GetEmails)
+	// mux.Post("/emails", )
+	mux.Post("/search", app.handlers.SearchEmails) // Nueva ruta POST para buscar correos electrónicos
 
 	return mux
 }

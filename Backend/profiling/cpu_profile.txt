@@ -1,0 +1,5 @@
+Type: cpu
+Time: Jun 23, 2024 at 11:20am (CST)
+Duration: 2.01s, Total samples = 0 
+Showing nodes accounting for 0, 0% of 0 total
+      flat  flat%   sum%        cum   cum%
